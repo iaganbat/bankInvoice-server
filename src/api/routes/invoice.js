@@ -12,7 +12,7 @@ const createdDateFormat = "yyyy/mm/dd HH:MM:ss:l";
 
 router.post("/importExcel", useJwt, async (req, res, next) => {
   try {
-    const { items } = req.body;
+    const { feeMustIncluded, items } = req.body;
 
     // console.log(req.body);
     // return res.status(400).json({ message: "OKLA" });
@@ -34,22 +34,40 @@ router.post("/importExcel", useJwt, async (req, res, next) => {
     tvp.columns.add("ReferenceNo", mssql.NVarChar(50));
     tvp.columns.add("CustomerId", mssql.NVarChar(50));
 
-    items.map((i) => {
-      tvp.rows.add(
-        i.rowNo,
-        i.invDate,
-        i.voucherDate,
-        i.voucherTime,
-        i.terminalNo,
-        i.cardNo,
-        Number(i.totalAmount),
-        Math.abs(Number(i.feeAmount)),
-        0,
-        Number(i.amount),
-        i.referenceNo,
-        i.customerId,
-      );
-    });
+    if (feeMustIncluded) {
+      items.map((i) => {
+        tvp.rows.add(
+          i.rowNo,
+          i.invDate,
+          i.invDate,
+          "",
+          "",
+          "",
+          Number(((Number(i.amount) * 100) / 99).toFixed(2)),
+          Number(((Number(i.amount) * 100) / 99).toFixed(2)) - Number(i.amount),
+          0,
+          Number(i.amount),
+          "",
+          i.customerId,
+        );
+      });
+    } else
+      items.map((i) => {
+        tvp.rows.add(
+          i.rowNo,
+          i.invDate,
+          i.voucherDate,
+          i.voucherTime,
+          i.terminalNo,
+          i.cardNo,
+          Number(i.totalAmount),
+          Math.abs(Number(i.feeAmount)),
+          0,
+          Number(i.amount),
+          i.referenceNo,
+          i.customerId,
+        );
+      });
 
     await POOL_CONNECT;
     const sqlRequest = CONNECTION_POOL.request();

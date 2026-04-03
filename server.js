@@ -12,7 +12,6 @@ function getLocalIpAddress() {
   const interfaces = os.networkInterfaces();
   for (const name in interfaces) {
     for (const iface of interfaces[name]) {
-      // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses
       if (iface.family === "IPv4" && !iface.internal) {
         return iface.address;
       }
@@ -20,7 +19,7 @@ function getLocalIpAddress() {
   }
   return "0.0.0.0"; // Default if none found
 }
-console.log("Local IP Address:", getLocalIpAddress());
+// console.log("Local IP Address:", getLocalIpAddress());
 server.listen(port, function () {
   // const a = require("./nodemon.json");
   // console.log(a.env.dbConfig);
